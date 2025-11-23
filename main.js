@@ -16,7 +16,7 @@ onresize = () => {
 
 function check_resize(){
     windowWidth = window.innerWidth;
-    if (windowWidth > minWidth){
+    if (windowWidth >= minWidth){
         set_infobar(false, false);
     } else if (windowWidth < 619){
         set_infobar(true, true);
