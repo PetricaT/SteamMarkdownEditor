@@ -19,42 +19,70 @@ function loadValue(v) {
 
 // Editor settings
 function updatePreview(operation) {
-    
-    if (operation == "wrap-text") {
-        if (document.getElementById("wrap-text").checked) {
-            document.getElementById("editor").style.whiteSpace = "pre-wrap";
-        } else {
-            document.getElementById("editor").style.whiteSpace = "pre";
-        }
-        return;
-    }
-    if (operation == "editor-change") {
-        var text = document.getElementById("editor").value;
-        //  "[b]", "[/b]", 
-        //  "[i]", "[/i]", 
-        //  "[u]", "[/u]",
-        //  "[strike]", "[/strike]", 
-        text = text.replaceAll("[b]", "<b>");
-        text = text.replaceAll("[/b]", "</b>");
-        text = text.replaceAll("[i]", "<i>");
-        text = text.replaceAll("[/i]", "</i>");
-        text = text.replaceAll("[u]", "<u>");
-        text = text.replaceAll("[/u]", "</u>");
-        text = text.replaceAll("[strike]", "<s>");
-        text = text.replaceAll("[/strike]", "</s>");
-        text = text.replaceAll(/\n/g, "<br>");
-        // Find [url] tags and replace them with <a> tags
-        text = text.replaceAll(/\[url=(.*?)\](.*?)\[\/url\]/g, (orig, url, text) => {
-            var domain = new URL(url).hostname;
-            if (!url.includes("steampowered") && !url.includes("steamcommunity")) {
-                return `<a href="${url}" class="link-preview">${text}</a> <div class="untrusted-domain">[${domain}]</div>`;
+    switch (operation) {
+        case "compact-view":
+            if (document.getElementById("compact-view").checked) {
+                document.getElementById("preview-container").style.maxWidth = "423px";
             } else {
-                return `<a href="${url}" class="link-preview">${text}</a>`;
+                document.getElementById("preview-container").style.maxWidth = "638px";
             }
-        });
-        document.getElementById("preview-container").innerHTML = text;
-        return;
+            break;
+        case "wrap-text":
+            if (document.getElementById("wrap-text").checked) {
+                document.getElementById("editor").style.whiteSpace = "pre-wrap";
+            } else {
+                document.getElementById("editor").style.whiteSpace = "pre";
+            }
+            break;
+        case "editor-change":
+            parseMarkdown();
+            break;
+
+        default:
+            break;
     }
+}
+
+function parseMarkdown() {
+    var text = document.getElementById("editor").value;
+    var untrustedDomain = "";
+    //  "[b]", "[/b]", 
+    //  "[i]", "[/i]", 
+    //  "[u]", "[/u]",
+    //  "[strike]", "[/strike]", 
+    text = text.replaceAll("[b]", "<b>");
+    text = text.replaceAll("[/b]", "</b>");
+    text = text.replaceAll("[i]", "<i>");
+    text = text.replaceAll("[/i]", "</i>");
+    text = text.replaceAll("[u]", "<u>");
+    text = text.replaceAll("[/u]", "</u>");
+    text = text.replaceAll("[strike]", "<s>");
+    text = text.replaceAll("[/strike]", "</s>");
+    text = text.replaceAll(/\n/g, "<br>");
+    // Find [url] tags and replace them with <a> tags
+    text = text.replaceAll(/\[url=(.*?)\](.*?)\[\/url\]/g, (orig, url, text) => {
+
+        // Handle invalid URLs
+        try {
+            var domain = new URL(url).hostname;
+        } catch (error) {
+            if (error.message.includes("is not a valid URL.")) {
+                url = "http://" + url;
+            } else {
+                throw error;
+            }
+        }
+
+        if (!url.includes("steampowered") && !url.includes("steamcommunity")) {
+            if(domain == undefined) {
+                domain = url.split("/")[2];
+            }
+            untrustedDomain = `<div class="untrusted-domain">[${domain}]</div>`;
+        }
+        return `<a href="${url}" class="link-preview">${text}</a>${untrustedDomain}`;
+    });
+    document.getElementById("preview-container").innerHTML = text;
+    return;
 }
 
 function updateLineNumbers() {

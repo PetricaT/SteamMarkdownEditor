@@ -36,19 +36,22 @@
     <div id="app">
         <div id="markdown">
             <div class="panel-header">Editor</div>
-            <div id="editor-settings">
+            <div class="editor-settings">
                 <input type="checkbox" id="wrap-text" onchange="updatePreview('wrap-text')">
                 <label for="wrap-text">Wrap-around text</label>
             </div>
             
             <div id="editor-wrapper">
                 <div id="line-numbers"></div>
-                <textarea spellcheck="false" id="editor" onkeyup='saveValue(this); updateLineNumbers()' placeholder="Write your guide :3">
-                </textarea>
+                <textarea spellcheck="false" id="editor" oninput="saveValue(this); updateLineNumbers()" placeholder="Write your guide :3"></textarea>
             </div>
         </div>
         <div id="preview">
             <div class="panel-header">Preview</div>
+            <div class="editor-settings">
+                <input type="checkbox" id="compact-view" onchange="updatePreview('compact-view')">
+                <label for="compact-view">Compact screen size (mobile view)</label>
+            </div>
             <div id="preview-container">
             </div>
         </div>
