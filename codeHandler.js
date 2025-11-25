@@ -46,25 +46,25 @@ function updatePreview(operation) {
 function parseMarkdown() {
     var text = document.getElementById("editor").value;
     var untrustedDomain = "";
-    //  "[b]", "[/b]", 
-    //  "[i]", "[/i]", 
-    //  "[u]", "[/u]",
-    //  "[strike]", "[/strike]", 
+    // Parse bold tags
     text = text.replaceAll("[b]", "<b>");
     text = text.replaceAll("[/b]", "</b>");
+    // Parse italic tags
     text = text.replaceAll("[i]", "<i>");
     text = text.replaceAll("[/i]", "</i>");
+    // Parse underline tags
     text = text.replaceAll("[u]", "<u>");
     text = text.replaceAll("[/u]", "</u>");
+    // Parse strike tags
     text = text.replaceAll("[strike]", "<s>");
     text = text.replaceAll("[/strike]", "</s>");
+    // Parse newlines
     text = text.replaceAll(/\n/g, "<br>");
-    // Find [url] tags and replace them with <a> tags
+    // Parse hyperlinks
     text = text.replaceAll(/\[url=(.*?)\](.*?)\[\/url\]/g, (orig, url, text) => {
-
         // Handle invalid URLs
         try {
-            var domain = new URL(url).hostname;
+            var domain = new URL(url).hostname; // Errors on invalid urls (don't contain http://)
         } catch (error) {
             if (error.message.includes("is not a valid URL.")) {
                 url = "http://" + url;
