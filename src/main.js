@@ -26,7 +26,7 @@ function check_resize(){
 }
 
 function set_infobar(colored = false, compact = false){
-    let l_tagline = "Online Steam Guide editor |";
+    let l_tagline = "Online Steam Markdown editor |";
     let l_window_width = window.innerWidth;
     let l_Version = `<p class="version">v${version}</p>`;
     let l_min_window_width = `Minimum width: ${minWidth}px`;

@@ -62,9 +62,26 @@ function parseMarkdown() {
     // Parse spoiler
     text = text.replaceAll("[spoiler]", "<span class='preview-spoiler'><span>");
     text = text.replaceAll("[/spoiler]", "</span></span>");
-    // Parse headear1
+    // Parse headear1-3
     text = text.replaceAll("[h1]", "<h1 class='preview-header'>");
     text = text.replaceAll("[/h1]", "</h1>");
+    text = text.replaceAll("[h2]", "<h2 class='preview-header'>");
+    text = text.replaceAll("[/h2]", "</h2>");
+    text = text.replaceAll("[h3]", "<h3 class='preview-header'>");
+    text = text.replaceAll("[/h3]", "</h3>");
+    // Parse horizontal rule
+    text = text.replaceAll("[hr]", "<hr>");
+    // Parse list
+    text = text.replaceAll("[list]", "<ul>");
+    text = text.replaceAll("[/list]", "</li></ul>");
+    // Parse ordered list
+    text = text.replaceAll("[olist]", "<ol>");
+    text = text.replaceAll("[/olist]", "</li></ol>");
+    text = text.replaceAll("[*]", "<li>");
+    // Parse code block
+    text = text.replaceAll("[code]", "<pre class='preview-code-block'><code>");
+    text = text.replaceAll("[/code]", "</code></pre>");
+
     // Parse newlines
     text = text.replaceAll(/\n/g, "<br>");
     // Parse hyperlinks

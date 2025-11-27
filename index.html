@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Steam Guide editor</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="main.js" defer></script>
-    <script src="codeHandler.js" defer></script>
-    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <title>Online Steam Markdown editor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="src/main.js" defer></script>
+    <script src="src/codeHandler.js" defer></script>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 
 <body>
@@ -17,7 +17,7 @@
     </noscript>
     <div id="infobar">
         <div id="infobar-title">
-            Online Steam Guide editor | <p class="version">v{{version}}</p> | Minimum width: 983px | Window width:
+            Online Steam Markdown editor | <p class="version">v{{version}}</p> | Minimum width: 983px | Window width:
             {{windowWidth}}
         </div>
     </div>
@@ -50,15 +50,20 @@
         Currently, it doesn't even support all the steam tags, only a few.
         <br><br>
         It has support for:
-        <ul>
-            <li>bold</li>
-            <li>italics</li>
-            <li>underline</li>
-            <li>strikethrough</li>
-            <li>hyperlinks</li>
-            <li>headings</li>
-            <li>spoiler tags</li>
-        </ul>
+        <table>
+            <tr>
+                <td>bold</td>
+                <td>italics</td>
+                <td>underline</td>
+                <td>strikethrough</td>
+            </tr>
+            <tr>
+                <td>hyperlinks</td>
+                <td>headings</td>
+                <td>spoiler tags</td>
+                <td>lists</td>
+            </tr>
+        </table>
     </footer>
 </body>
 </html>
