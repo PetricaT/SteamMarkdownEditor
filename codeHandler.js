@@ -45,6 +45,7 @@ function updatePreview(operation) {
 
 function parseMarkdown() {
     var text = document.getElementById("editor").value;
+    text = '<br><br>' + text;
     var untrustedDomain = "";
     // Parse bold tags
     text = text.replaceAll("[b]", "<b>");
@@ -59,7 +60,7 @@ function parseMarkdown() {
     text = text.replaceAll("[strike]", "<s>");
     text = text.replaceAll("[/strike]", "</s>");
     // Parse spoiler
-    text = text.replaceAll("[spoiler]", "<span><span class='preview-spoiler'>");
+    text = text.replaceAll("[spoiler]", "<span class='preview-spoiler'><span>");
     text = text.replaceAll("[/spoiler]", "</span></span>");
     // Parse headear1
     text = text.replaceAll("[h1]", "<h1 class='preview-header'>");

@@ -198,17 +198,30 @@ textarea#editor:focus {
     padding-left: 10px;
     margin-right: 10px;
     border-left: solid 1px #686868;
+
+    text-decoration-color: rgb(94, 151, 201);
+}
+
+::selection,
+::-moz-selection{
+    background:#54a5d4;
+    text-shadow:1px 1px 2px #000000aa;
+    color:#fff;
 }
 
 #preview-container {
     /* Steam's font color */
     font-size: 14px;
     word-wrap: break-word;
-    margin-top: 10px;
+    margin-top:10px;
     line-height: 20px;
     padding-bottom: 16px;
     padding-right: 8px;
     color: #acb2b8;
+
+    background: url( 'https://community.fastly.steamstatic.com/public/images/groups/content_footer_fade.png?v=1' ) bottom right no-repeat, url( 'https://community.fastly.steamstatic.com/public/images/groups/group_content_topbackground.png?v=1' ) 0px 8px no-repeat, url( 'https://community.fastly.steamstatic.com/public/images/groups/content_header_rule.png?v=1' ) -4px 0px no-repeat;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
 }
 
 #preview-container .header {
@@ -244,8 +257,4 @@ span.preview-spoiler {
 
 span.preview-spoiler:hover {
     color: #fff;
-}
-
-span.preview-spoiler > span {
-  visibility: hidden;
 }
