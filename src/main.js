@@ -1,6 +1,7 @@
 let version = "0.1.2";
 let minWidth = 983;
 let windowWidth = window.innerWidth;
+let DEBUG_MODE = false;
 
 // Create a copy of the default infobar with variables in plain text
 let infobar_default = document.getElementById("infobar-title").innerHTML.replace("{{version}}", version);
@@ -23,6 +24,18 @@ function check_resize(){
     } else {
         set_infobar(true);
     }
+    if(DEBUG_MODE){
+        set_debugbar()
+    }
+}
+
+function set_debugbar(){
+    let debugbar_defualt = document.getElementById("debugbar-title");
+    let l_window_height = window.innerHeight;
+    let debugbar_local = `Height: ${l_window_height}`
+    // border-top: solid 1px var(--ChalkyBlue);
+    debugbar_defualt.style.borderTop = "solid 1px var(--ChalkyBlue)"
+    debugbar_defualt.innerHTML = debugbar_local;
 }
 
 function set_infobar(colored = false, compact = false){
