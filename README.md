@@ -1,6 +1,10 @@
-# Guide editing made easy
+<div align="center">
+<a href="https://petricat.github.io/SteamMarkdownEditor/"><img src="./images/logo.png" width="420px">
+</a>
 
-EDITOR: [Github Page](https://petricat.github.io/SteamMarkdownEditor/)
+[Live Editor](https://petricat.github.io/SteamMarkdownEditor/) · 
+
+</div>
 
 ---
 
