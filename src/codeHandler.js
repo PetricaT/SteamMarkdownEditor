@@ -1,5 +1,8 @@
 document.getElementById("editor").value = loadValue("editor");
 
+const HighlightedTextArea = document.getElementById("highlighted-editor");
+const EditorTextArea = document.getElementById("editor");
+
 updatePreview("editor-change");
 
 // Saving and loading functions
@@ -35,6 +38,7 @@ function updatePreview(operation) {
             }
             break;
         case "editor-change":
+            // HighlightedTextArea.innerHTML = EditorTextArea.value;
             parseMarkdown();
             break;
 
@@ -103,7 +107,7 @@ function parseMarkdown() {
             }
             untrustedDomain = `<div class="untrusted-domain">[${domain}]</div>`;
         }
-        return `<a href="${url}" class="link-preview">${text}</a>${untrustedDomain}`;
+        return `<a href="${url}" class="link-preview" target="_blank">${text}</a>${untrustedDomain}`;
     });
     document.getElementById("preview-container").innerHTML = text;
     return;

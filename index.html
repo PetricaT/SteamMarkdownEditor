@@ -28,9 +28,9 @@
     <div id="app">
         <div id="markdown">
             <div class="panel-header">Editor</div>
-            <div class="editor-settings">
-                <input type="checkbox" id="wrap-text" onchange="updatePreview('wrap-text')">
-                <label for="wrap-text">Wrap-around text</label>
+            <div class="editor-settings" title="This option is currently disabled as it breaks line numbering. Will be fixed in the future">
+                <input type="checkbox" class="is-disabled" id="wrap-text" onchange="updatePreview('wrap-text')" disabled>
+                <label class="no-select" for="wrap-text">Wrap-around text</label>
             </div>
             
             <div id="editor-wrapper">
@@ -42,7 +42,7 @@
             <div class="panel-header">Preview</div>
             <div class="editor-settings">
                 <input type="checkbox" id="compact-view" onchange="updatePreview('compact-view')">
-                <label for="compact-view">Compact screen size (mobile view)</label>
+                <label class="no-select" for="compact-view">Compact screen size (mobile view)</label>
             </div>
             <div id="preview-container">
             </div>

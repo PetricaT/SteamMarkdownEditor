@@ -109,6 +109,7 @@ table, th, td {
 
 #line-numbers>span {
     display: block;
+    font-size: 0.6rem;
 }
 
 #editor-wrapper {
@@ -119,6 +120,7 @@ table, th, td {
 #editor {
     padding-left: 40px;
     white-space: pre;
+    font-size: 0.6rem;
 }
 
 .untrusted-domain {
@@ -178,6 +180,14 @@ table, th, td {
     align-self: center;
 }
 
+.no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 #app {
     z-index: 0;
     display: flex;
@@ -200,6 +210,12 @@ table, th, td {
     color: #969696;
     font-size: small;
     border-bottom: 1px solid #969696;
+
+    cursor:help;
+}
+
+.is-disabled {
+    cursor:help;
 }
 
 textarea#editor {
