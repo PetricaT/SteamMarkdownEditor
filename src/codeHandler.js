@@ -1,126 +1,249 @@
-document.getElementById("editor").value = loadValue("editor");
+import { tokenize, renderHighlight, renderPreviewFull, findErrorRanges } from "./markdownEngine.js";
 
-const HighlightedTextArea = document.getElementById("highlighted-editor");
-const EditorTextArea = document.getElementById("editor");
+const editorEl      = document.getElementById("editor");
+const highlightEl   = document.getElementById("highlighted-code");
+const previewEl     = document.getElementById("preview-container");
+const lineNumbersEl = document.getElementById("line-numbers");
 
-updatePreview("editor-change");
+// ── Bootstrap ─────────────────────────────────────────────────
+(function init() {
+    const saved = localStorage.getItem("editor-content") ?? "";
+    setEditorContent(saved);
+    syncAll();
+})();
 
-// Saving and loading functions
-function saveValue(e) {
-    var id = e.id;
-    var value = e.value;
-    localStorage.setItem(id, value);
-    updatePreview("editor-change");
-}
-
-function loadValue(v) {
-    if (!localStorage.getItem(v)) {
-        return "";
+// ── setEditorContent ──────────────────────────────────────────
+// Canonical DOM form: interleaved (textNode?, BR)* nodes.
+// A line "foo\nbar" becomes: TEXT("foo") BR TEXT("bar")
+// An empty line in "foo\n\nbar" becomes: TEXT("foo") BR BR TEXT("bar")
+// This is the only structure getPlainText and setCaretOffset expect.
+function setEditorContent(text) {
+    editorEl.innerHTML = "";
+    const lines = text.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].length > 0) {
+            editorEl.appendChild(document.createTextNode(lines[i]));
+        }
+        if (i < lines.length - 1) {
+            editorEl.appendChild(document.createElement("br"));
+        }
     }
-    return localStorage.getItem(v);
 }
 
-// Editor settings
-function updatePreview(operation) {
+// ── getPlainText ──────────────────────────────────────────────
+function getPlainText() {
+    let text = "";
+    for (const node of editorEl.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            text += node.textContent;
+        } else if (node.nodeName === "BR") {
+            text += "\n";
+        } else {
+            // Flatten any rogue block the browser inserted
+            text += node.innerText ?? node.textContent;
+        }
+    }
+    return text;
+}
+
+// ── caretToOffset ─────────────────────────────────────────────
+// Converts a (container, offsetInContainer) DOM position to a
+// plain-text character offset. Handles two cases:
+//
+//   A) container is a TEXT node inside editorEl:
+//      offsetInContainer is a character index within that node.
+//
+//   B) container is editorEl itself:
+//      offsetInContainer is a child-node index. This happens when
+//      the caret sits between block-level children (e.g. after a BR).
+//
+function caretToOffset(container, offsetInContainer) {
+    let count = 0;
+    const children = Array.from(editorEl.childNodes);
+
+    // Determine the stopping child index
+    let stopChildIndex;
+    let stopCharOffset = 0;
+
+    if (container === editorEl) {
+        // Case B: stop before child at index offsetInContainer
+        stopChildIndex = offsetInContainer;
+    } else {
+        // Case A: find which child the container is
+        stopChildIndex = children.indexOf(container);
+        stopCharOffset = offsetInContainer;
+    }
+
+    for (let i = 0; i < children.length; i++) {
+        if (i === stopChildIndex) {
+            count += stopCharOffset;
+            return count;
+        }
+        const node = children[i];
+        if (node.nodeType === Node.TEXT_NODE) {
+            count += node.textContent.length;
+        } else if (node.nodeName === "BR") {
+            count += 1;
+        }
+    }
+    return count;
+}
+
+function getCaretOffset() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return 0;
+    const r = sel.getRangeAt(0);
+    return caretToOffset(r.startContainer, r.startOffset);
+}
+
+// ── setCaretOffset ────────────────────────────────────────────
+// Restores caret to a plain-text character offset in the rebuilt DOM.
+function setCaretOffset(offset) {
+    const sel   = window.getSelection();
+    const range = document.createRange();
+    let rem = offset;
+
+    for (const node of editorEl.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const len = node.textContent.length;
+            if (rem <= len) {
+                range.setStart(node, rem);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                return;
+            }
+            rem -= len;
+        } else if (node.nodeName === "BR") {
+            if (rem === 0) {
+                range.setStartBefore(node);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                return;
+            }
+            rem -= 1;
+        }
+    }
+
+    // Offset is at or past end -- place caret after the last node
+    const last = editorEl.lastChild;
+    if (last) {
+        if (last.nodeType === Node.TEXT_NODE) {
+            range.setStart(last, last.textContent.length);
+        } else {
+            range.setStartAfter(last);
+        }
+    } else {
+        range.setStart(editorEl, 0);
+    }
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+// ── syncAll ───────────────────────────────────────────────────
+function syncAll() {
+    const raw    = getPlainText();
+    const tokens = tokenize(raw);
+    const errors = findErrorRanges(tokens);
+
+    highlightEl.innerHTML = renderHighlight(tokens, errors) + "\n";
+    previewEl.innerHTML   = renderPreviewFull(tokens);
+    updateLineNumbers(raw);
+    localStorage.setItem("editor-content", raw);
+}
+
+// ── insertAtCaret ─────────────────────────────────────────────
+// Used for Enter (\n) and Tab (two spaces). Both are preventDefault'd
+// in keydown so no `input` event fires -- we call syncAll ourselves.
+function insertAtCaret(str) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+
+    const range   = sel.getRangeAt(0);
+    const selLen  = range.toString().length;
+    const caretEnd = getCaretOffset();
+    const start   = caretEnd - selLen;
+    const raw     = getPlainText();
+
+    const newRaw   = raw.slice(0, start) + str + raw.slice(caretEnd);
+    const newCaret = start + str.length;
+
+    setEditorContent(newRaw);
+    setCaretOffset(newCaret);
+    syncAll();
+}
+
+// ── Keyboard ──────────────────────────────────────────────────
+editorEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        insertAtCaret("\n");
+        return;
+    }
+    if (e.key === "Tab") {
+        e.preventDefault();
+        insertAtCaret("  ");
+    }
+});
+
+// ── Input (backspace, delete, regular chars) ──────────────────
+// The browser has mutated the DOM. Read caret + text from the
+// mutated state, then immediately rebuild to canonical form.
+editorEl.addEventListener("input", () => {
+    const offset = getCaretOffset();
+    const raw    = getPlainText();
+    setEditorContent(raw);
+    setCaretOffset(offset);
+    syncAll();
+});
+
+// ── Paste ─────────────────────────────────────────────────────
+editorEl.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+
+    const range    = sel.getRangeAt(0);
+    const selLen   = range.toString().length;
+    const caretEnd = getCaretOffset();
+    const start    = caretEnd - selLen;
+    const raw      = getPlainText();
+    const pasted   = e.clipboardData.getData("text/plain");
+
+    const newRaw   = raw.slice(0, start) + pasted + raw.slice(caretEnd);
+    const newCaret = start + pasted.length;
+
+    setEditorContent(newRaw);
+    setCaretOffset(newCaret);
+    syncAll();
+});
+
+// ── Scroll sync ───────────────────────────────────────────────
+editorEl.addEventListener("scroll", () => {
+    highlightEl.scrollTop  = editorEl.scrollTop;
+    highlightEl.scrollLeft = editorEl.scrollLeft;
+});
+
+// ── Line numbers ──────────────────────────────────────────────
+function updateLineNumbers(raw) {
+    const count = (raw.match(/\n/g) ?? []).length + 1;
+    if (lineNumbersEl.dataset.count === String(count)) return;
+    lineNumbersEl.dataset.count = count;
+    let html = "";
+    for (let n = 1; n <= count; n++) html += `<span>${n}</span>`;
+    lineNumbersEl.innerHTML = html;
+}
+
+// ── Editor settings ───────────────────────────────────────────
+window.updatePreview = function(operation) {
     switch (operation) {
         case "compact-view":
-            if (document.getElementById("compact-view").checked) {
-                document.getElementById("preview-container").style.maxWidth = "423px";
-            } else {
-                document.getElementById("preview-container").style.maxWidth = "638px";
-            }
+            previewEl.style.maxWidth = document.getElementById("compact-view").checked ? "423px" : "638px";
             break;
         case "wrap-text":
-            if (document.getElementById("wrap-text").checked) {
-                document.getElementById("editor").style.whiteSpace = "pre-wrap";
-            } else {
-                document.getElementById("editor").style.whiteSpace = "pre";
-            }
-            break;
-        case "editor-change":
-            // HighlightedTextArea.innerHTML = EditorTextArea.value;
-            parseMarkdown();
-            break;
-
-        default:
+            editorEl.style.whiteSpace = document.getElementById("wrap-text").checked ? "pre-wrap" : "pre";
             break;
     }
-}
-
-function parseMarkdown() {
-    var text = document.getElementById("editor").value;
-    text = '<br><br>' + text;
-    var untrustedDomain = "";
-    // Parse bold tags
-    text = text.replaceAll("[b]", "<b>");
-    text = text.replaceAll("[/b]", "</b>");
-    // Parse italic tags
-    text = text.replaceAll("[i]", "<i>");
-    text = text.replaceAll("[/i]", "</i>");
-    // Parse underline tags
-    text = text.replaceAll("[u]", "<u>");
-    text = text.replaceAll("[/u]", "</u>");
-    // Parse strike tags
-    text = text.replaceAll("[strike]", "<s>");
-    text = text.replaceAll("[/strike]", "</s>");
-    // Parse spoiler
-    text = text.replaceAll("[spoiler]", "<span class='preview-spoiler'><span>");
-    text = text.replaceAll("[/spoiler]", "</span></span>");
-    // Parse headear1-3
-    text = text.replaceAll("[h1]", "<h1 class='preview-header'>");
-    text = text.replaceAll("[/h1]", "</h1>");
-    text = text.replaceAll("[h2]", "<h2 class='preview-header'>");
-    text = text.replaceAll("[/h2]", "</h2>");
-    text = text.replaceAll("[h3]", "<h3 class='preview-header'>");
-    text = text.replaceAll("[/h3]", "</h3>");
-    // Parse horizontal rule
-    text = text.replaceAll("[hr]", "<hr>");
-    // Parse list
-    text = text.replaceAll("[list]", "<ul>");
-    text = text.replaceAll("[/list]", "</li></ul>");
-    // Parse ordered list
-    text = text.replaceAll("[olist]", "<ol>");
-    text = text.replaceAll("[/olist]", "</li></ol>");
-    text = text.replaceAll("[*]", "<li>");
-    // Parse code block
-    text = text.replaceAll("[code]", "<pre class='preview-code-block'><code>");
-    text = text.replaceAll("[/code]", "</code></pre>");
-
-    // Parse newlines
-    text = text.replaceAll(/\n/g, "<br>");
-    // Parse hyperlinks
-    text = text.replaceAll(/\[url=(.*?)\](.*?)\[\/url\]/g, (orig, url, text) => {
-        // Handle invalid URLs
-        try {
-            var domain = new URL(url).hostname; // Errors on invalid urls (don't contain http://)
-        } catch (error) {
-            if (error.message.includes("is not a valid URL.")) {
-                url = "http://" + url;
-            } else {
-                throw error;
-            }
-        }
-
-        if (!url.includes("steampowered") && !url.includes("steamcommunity")) {
-            if(domain == undefined) {
-                domain = url.split("/")[2];
-            }
-            untrustedDomain = `<div class="untrusted-domain">[${domain}]</div>`;
-        }
-        return `<a href="${url}" class="link-preview" target="_blank">${text}</a>${untrustedDomain}`;
-    });
-    document.getElementById("preview-container").innerHTML = text;
-    return;
-}
-
-function updateLineNumbers() {
-    var editor = document.getElementById("editor");
-    var lineNumbers = document.getElementById("line-numbers");
-    var lines = editor.value.split("\n");
-    var lineNumbersHTML = "";
-    for (var i = 0; i < lines.length; i++) {
-        lineNumbersHTML += "<span>" + (i + 1) + "</span>";
-    }
-    lineNumbers.innerHTML = lineNumbersHTML;
-}
-updateLineNumbers();
+};

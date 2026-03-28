@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Steam Markdown editor</title>
     <link rel="stylesheet" href="css/style.css">
+    <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="src/main.js" defer></script>
-    <script src="src/codeHandler.js" defer></script>
+    <script type="module" src="src/codeHandler.js"></script>
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 
@@ -15,57 +17,82 @@
     <noscript>
         You need to enable JavaScript to run this app, sorry.
     </noscript>
+
     <div id="infobar">
         <div id="infobar-title">
-            Online Steam Markdown editor | <p class="version">v{{version}}</p> | Minimum width: 983px | Window width:
-            {{windowWidth}}
+            Online Steam Markdown editor | <p class="version">v{{version}}</p> | Minimum width: 983px | Window width: {{windowWidth}}
         </div>
     </div>
     <div id="debugbar">
-        <div id="debugbar-title">
-        </div>
+        <div id="debugbar-title"></div>
     </div>
+
     <div id="app">
+        <!-- ── Editor pane ─────────────────────────────────── -->
         <div id="markdown">
             <div class="panel-header">Editor</div>
-            <div class="editor-settings" title="This option is currently disabled as it breaks line numbering. Will be fixed in the future">
-                <input type="checkbox" class="is-disabled" id="wrap-text" onchange="updatePreview('wrap-text')" disabled>
+            <div class="editor-settings is-disabled" title="This option is currently disabled as it breaks line numbering. Will be fixed in the future">
+                <input type="checkbox" id="wrap-text" onchange="updatePreview('wrap-text')" disabled>
                 <label class="no-select" for="wrap-text">Wrap-around text</label>
             </div>
-            
+
             <div id="editor-wrapper">
                 <div id="line-numbers"></div>
-                <textarea spellcheck="false" id="editor" oninput="saveValue(this); updateLineNumbers()" placeholder="Write your guide :3"></textarea>
+                <div id="editor-container">
+                    <div
+                        id="editor"
+                        contenteditable="true"
+                        spellcheck="false"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        data-placeholder="Write your guide :3"
+                        aria-label="BBCode editor"
+                        role="textbox"
+                        aria-multiline="true"
+                    ></div>
+                    <div id="highlighted-code" aria-hidden="true"></div>
+                </div>
             </div>
         </div>
+
+        <!-- ── Preview pane ───────────────────────────────── -->
         <div id="preview">
             <div class="panel-header">Preview</div>
             <div class="editor-settings">
                 <input type="checkbox" id="compact-view" onchange="updatePreview('compact-view')">
                 <label class="no-select" for="compact-view">Compact screen size (mobile view)</label>
             </div>
-            <div id="preview-container">
-            </div>
+            <div id="preview-container"></div>
         </div>
     </div>
+
     <footer>
         <h4>About</h4>
-        This is a very experimental project. Don't expect it to work properly. 
-        Currently, it doesn't even support all the steam tags, only a few.
+        Experimental Steam BBCode editor with live preview and syntax highlighting.
         <br><br>
-        It has support for:
+        Supported tags:
         <table>
             <tr>
-                <td>bold</td>
-                <td>italics</td>
-                <td>underline</td>
-                <td>strikethrough</td>
+                <td>[b] bold</td>
+                <td>[i] italic</td>
+                <td>[u] underline</td>
+                <td>[strike]</td>
             </tr>
             <tr>
-                <td>hyperlinks</td>
-                <td>headings</td>
-                <td>spoiler tags</td>
-                <td>lists</td>
+                <td>[h1] [h2] [h3]</td>
+                <td>[url=…] links</td>
+                <td>[spoiler]</td>
+                <td>[hr]</td>
+            </tr>
+            <tr>
+                <td>[list] / [olist]</td>
+                <td>[code]</td>
+                <td>[quote=…]</td>
+                <td>[table][tr][td][th]</td>
+            </tr>
+            <tr>
+                <td>[noparse]</td>
+                <td colspan="3">&nbsp;</td>
             </tr>
         </table>
     </footer>

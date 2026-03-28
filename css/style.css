@@ -22,17 +22,9 @@
     --LightBlue: #B3DFFF;
     --Yellow: #FFC82C;
     --ChalkyBlue: #66C0F4;
-
-    --hatched-glossy: (linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 20%),
-            linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.35)),
-
-            repeating-linear-gradient(-45deg,
-                rgba(0, 0, 0, 0.15) 0px,
-                rgba(0, 0, 0, 0.15) 2px,
-                transparent 2px,
-                transparent 4px);
-        )
 }
+
+/* ── Base ───────────────────────────────────────────────────── */
 
 html {
     font-family: "Motiva Sans", Meiryo, "Noto Sans", "Microsoft Sans Serif" !important;
@@ -45,6 +37,14 @@ html {
     color: #fff;
 }
 
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* ── Utility ────────────────────────────────────────────────── */
+
 p.version {
     all: unset;
     color: #b4b4b4;
@@ -55,88 +55,28 @@ p.width-error {
     color: red;
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+.no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-footer {
-    z-index: 11;
-    border-width: 1px 0 0 0;
-    border-style: solid solid solid solid;
-    border-color: #535353;
-    background-color: #1b2838;
-    background-image:
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 20%),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.35)),
-
-        repeating-linear-gradient(-45deg,
-            rgba(0, 0, 0, 0.15) 0px,
-            rgba(0, 0, 0, 0.15) 2px,
-            transparent 2px,
-            transparent 4px);
-    position: relative;
-    height: fit-content;
+::selection,
+::-moz-selection {
+    background: #54a5d4;
+    text-shadow: 1px 1px 2px #000000aa;
     color: #fff;
-    font-size: 0.8rem;
-    padding: 15px;
-    text-align: left;
-    bottom: 0;
-    height: 210px;
 }
 
-table, th, td {
-    border-collapse: collapse;
-    padding: 5px;
-    border: 1px solid #686868;
-}
-
-#line-numbers {
-    top: 0;
-    left: 0;
-    width: 40px;
-    height: 100%;
-    background-color: #121820;
-    color: #fff;
-    font-size: small;
-    padding-right: 5px;
-    padding-top: 5px;
-    text-align: right;
-    border-right: solid 1px #686868;
-    z-index: 1;
-}
-
-#line-numbers>span {
-    display: block;
-    font-size: 0.6rem;
-}
-
-#editor-wrapper {
-    display: flex;
-    height: 100%;
-}
-
-#editor {
-    padding-left: 40px;
-    white-space: pre;
-    font-size: 0.6rem;
-}
-
-.untrusted-domain {
-    all: unset;
-    font-size: 10px;
-    color: #7e8391;
-    padding: 4px;
-}
+/* ── Bars ───────────────────────────────────────────────────── */
 
 #infobar {
-    /* background: linear-gradient(to bottom, var(--Green), var(--GreenLow)); */
     background: var(--Green);
     background-image:
         linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 20%),
         linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.35)),
-
         repeating-linear-gradient(-45deg,
             rgba(0, 0, 0, 0.15) 0px,
             rgba(0, 0, 0, 0.15) 2px,
@@ -157,14 +97,12 @@ table, th, td {
     background-image:
         linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 20%),
         linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.35)),
-
         repeating-linear-gradient(-45deg,
             rgba(0, 0, 0, 0.15) 0px,
             rgba(0, 0, 0, 0.15) 2px,
             transparent 2px,
             transparent 4px);
     border-top: solid 0px var(--ChalkyBlue);
-    border-radius: 0px 0px 0px 0px;
     color: #fff;
     font-size: medium;
     padding-left: 10px;
@@ -173,20 +111,7 @@ table, th, td {
     white-space: nowrap;
 }
 
-.panel-header {
-    font-size: large;
-    border-bottom: 1px solid #686868;
-    margin-bottom: 20px;
-    align-self: center;
-}
-
-.no-select {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
+/* ── Layout ─────────────────────────────────────────────────── */
 
 #app {
     z-index: 0;
@@ -203,6 +128,13 @@ table, th, td {
     min-width: 300px;
 }
 
+.panel-header {
+    font-size: large;
+    border-bottom: 1px solid #686868;
+    margin-bottom: 20px;
+    align-self: center;
+}
+
 .editor-settings {
     display: flex;
     align-items: center;
@@ -210,36 +142,112 @@ table, th, td {
     color: #969696;
     font-size: small;
     border-bottom: 1px solid #969696;
-
-    cursor:help;
+    cursor: default;
 }
 
-.is-disabled {
-    cursor:help;
+/* ── Editor container ───────────────────────────────────────── */
+
+#editor-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden; /* wrapper clips both child scrollers */
+    position: relative;
 }
 
-textarea#editor {
-    min-width: 250px;
+#line-numbers {
+    width: 36px;
+    min-width: 36px;
+    background-color: #121820;
+    color: #888;
+    font-family: Monospace !important;
+    font-size: 0.6rem;
+    padding-right: 5px;
+    padding-top: 5px;
+    text-align: right;
+    border-right: solid 1px #686868;
+    overflow: hidden;          /* numbers scroll via JS offset, not CSS */
+    user-select: none;
+    z-index: 6;
+    flex-shrink: 0;
+}
+
+#line-numbers > span {
+    display: block;
+    line-height: 1.2rem; /* must match editor line-height */
+}
+
+#editor-container {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Both editor and highlight overlay share identical geometry/font.
+   The editor sits on top (z-index 5) and is nearly transparent so
+   the coloured layer beneath shows through.                        */
+
+#editor,
+#highlighted-code {
+    font-family: Monospace, "Motiva Sans", Meiryo, "Noto Sans", "Microsoft Sans Serif" !important;
+    font-size: 0.6rem;
+    line-height: 1.2rem;        /* kept in sync with line-numbers */
+    white-space: pre;
+    word-break: normal;
+    tab-size: 2;
+
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    padding: 5px;
-    background-color: #121820;
-    color: #fff;
+
+    padding: 5px 8px;
+    box-sizing: border-box;
+    margin: 0;
     border: none;
-    resize: none;
+    overflow: auto;
 }
 
-textarea#editor:active,
-textarea#editor:focus {
+/* ── contenteditable editor ─────────────────────────────────── */
+
+#editor {
+    z-index: 5;
+    color: #ffffff00;
+    background: transparent;
+    caret-color: #fff;
     outline: none;
-    border: none;
+    resize: none;
+    /* allow wrap-text toggle to work */
 }
+
+/* CSS-only placeholder using data-placeholder attribute */
+#editor:empty::before {
+    content: attr(data-placeholder);
+    color: #555;
+    pointer-events: none;
+}
+
+#editor:focus {
+    outline: none;
+}
+
+/* ── Highlight overlay ──────────────────────────────────────── */
+
+#highlighted-code {
+    z-index: 4;
+    color: #d4d4d4;             /* default text colour */
+    background-color: #121820;
+    pointer-events: none;       /* clicks fall through to #editor */
+    overflow: hidden;           /* scrolled via JS in sync with editor */
+}
+
+/* ── Preview pane ───────────────────────────────────────────── */
 
 #preview {
     /* Steam uses a constant 638px width */
-    max-width:  638px;
-    min-width:  638px;
-    width:      638px;
+    max-width: 638px;
+    min-width: 638px;
+    width: 638px;
 
     display: flex;
     flex-direction: column;
@@ -247,57 +255,49 @@ textarea#editor:focus {
     padding-left: 10px;
     margin-right: 10px;
     border-left: solid 1px #686868;
-
     text-decoration-color: rgb(94, 151, 201);
-}
-
-::selection,
-::-moz-selection{
-    background:#54a5d4;
-    text-shadow:1px 1px 2px #000000aa;
-    color:#fff;
+    overflow-y: auto;
 }
 
 #preview-container {
-    /* Steam's font color */
     font-size: 14px;
     word-wrap: break-word;
-    margin-top:10px;
+    margin-top: 10px;
     line-height: 20px;
-    padding-bottom: 16px;
     padding-right: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
     color: #acb2b8;
     text-align: left;
 
-    background: url('../images/content_footer_fade.png') bottom right no-repeat, url('../images/group_content_topbackground.png') 0px 8px no-repeat, url('../images/content_header_rule.png') -4px 0px no-repeat;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
+    background:
+        url('../images/content_footer_fade.png') bottom right no-repeat,
+        url('../images/group_content_topbackground.png') 0px 8px no-repeat,
+        url('../images/content_header_rule.png') -4px 0px no-repeat;
 }
 
-#preview-container .header {
-    color: #66C0F4;
+.is-disabled {
+    cursor:help;
 }
 
-#preview-container a {
-    text-decoration: none;
-    color: #fff;
-}
+/* Preview typography */
 
-#preview-container a:hover {
-    text-decoration: none;
-    color: #66C0F4;
-}
+#preview-container .header { color: #66C0F4; }
 
-#preview-container code{
+#preview-container a             { text-decoration: none; color: #fff; }
+#preview-container a:hover       { text-decoration: none; color: #66C0F4; }
+
+#preview-container code,
+#preview-container pre.preview-code-block code {
+    display: block;
     border: 1px solid #535354;
     border-radius: 3px;
     padding: 12px;
-    margin: 8px;
+    margin: 8px 0;
     font-size: 11px;
     font-family: Consolas, "Menlo", "Lucida Console", "Lucida Sans Typewriter", monospace;
-    white-space: pre;
-    white-space: pre-wrap;
     overflow-x: auto;
+    /* Prism-tomorrow provides its own background; we let it win */
 }
 
 h1.preview-header {
@@ -305,16 +305,14 @@ h1.preview-header {
     line-height: 23px;
     color: #5aa9d6;
     font-weight: normal;
-    margin: 0;
+    margin: 0 0 10px;
     padding: 0;
-    margin-bottom: 10px;
     clear: both;
 }
 
 h2.preview-header {
     color: #5aa9d6;
-    margin-bottom: 6px;
-    margin-top: 8px;
+    margin: 8px 0 6px;
     font-size: 18px;
     line-height: 21px;
     font-weight: 400;
@@ -323,8 +321,7 @@ h2.preview-header {
 
 h3.preview-header {
     color: #5aa9d6;
-    margin-bottom: 6px;
-    margin-top: 8px;
+    margin: 8px 0 6px;
     font-size: 16px;
     line-height: 19px;
     font-weight: 300;
@@ -335,8 +332,79 @@ span.preview-spoiler {
     background-color: #000;
     color: #000;
     padding: 0 8px;
+    cursor: pointer;
 }
 
-span.preview-spoiler:hover {
+span.preview-spoiler:hover { color: #fff; }
+
+/* ── Quote block ────────────────────────────────────────────── */
+
+blockquote.preview-quote {
+    border-left: 3px solid #417a9b;
+    margin: 8px 0 8px 0;
+    padding: 6px 12px;
+    background-color: rgba(65, 122, 155, 0.12);
+    color: #8f98a0;
+    font-style: italic;
+}
+
+blockquote.preview-quote cite {
+    display: block;
+    font-size: 0.85em;
+    font-style: normal;
+    color: #66C0F4;
+    margin-bottom: 4px;
+}
+
+/* ── Tables in preview ──────────────────────────────────────── */
+
+table.preview-table,
+table.preview-table th,
+table.preview-table td {
+    border-collapse: collapse;
+    padding: 5px 8px;
+    border: 1px solid #686868;
+    color: #acb2b8;
+}
+
+/* ── Shared footer table (about section) ────────────────────── */
+
+table, th, td {
+    border-collapse: collapse;
+    padding: 5px;
+    border: 1px solid #686868;
+}
+
+/* ── Untrusted domain badge ─────────────────────────────────── */
+
+.untrusted-domain {
+    display: inline-block;
+    font-size: 10px;
+    color: #7e8391;
+    padding: 2px 4px;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+
+footer {
+    z-index: 11;
+    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-color: #535353;
+    background-color: #1b2838;
+    background-image:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 20%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.35)),
+        repeating-linear-gradient(-45deg,
+            rgba(0, 0, 0, 0.15) 0px,
+            rgba(0, 0, 0, 0.15) 2px,
+            transparent 2px,
+            transparent 4px);
+    position: relative;
     color: #fff;
+    font-size: 0.8rem;
+    padding: 15px;
+    text-align: left;
+    height: 210px;
+    box-sizing: border-box;
 }
