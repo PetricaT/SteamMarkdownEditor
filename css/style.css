@@ -237,9 +237,9 @@ textarea#editor:focus {
 
 #preview {
     /* Steam uses a constant 638px width */
-    max-width:  648px;
-    min-width:  648px;
-    width:      648px;
+    max-width:  638px;
+    min-width:  638px;
+    width:      638px;
 
     display: flex;
     flex-direction: column;
